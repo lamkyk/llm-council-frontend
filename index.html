@@ -2,29 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>LLM Council - Secure Edition</title>
+<title>LLM Council — Secure Edition</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
+  :root {
+    --bg: #f9f9fb;
+    --text: #111;
+    --panel: white;
+    --border: #ddd;
+    --subtle: #666;
+  }
+  [data-theme='dark'] {
+    --bg: #111;
+    --text: #eee;
+    --panel: #1c1c1c;
+    --border: #333;
+    --subtle: #aaa;
+  }
+
   body {
-    font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Lato", sans-serif;
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
-    background: #f9f9fb;
-    color: #111;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+    position: relative;
   }
 
-  h1 {
-    margin-bottom: 4px;
-  }
+  h1 { margin-bottom: 6px; }
 
-  p.subtitle {
-    margin-top: 0;
+  .subtitle {
+    font-size: 0.9em;
+    color: var(--subtle);
     margin-bottom: 20px;
-    font-size: 0.95em;
-    color: #555;
+    margin-top: -6px;
+  }
+
+  .dark-toggle {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 4px;
+    user-select: none;
   }
 
   textarea {
@@ -32,9 +59,24 @@
     height: 130px;
     padding: 12px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     font-size: 16px;
     resize: vertical;
+    font-family: "Lato", sans-serif;
+    background: var(--panel);
+    color: var(--text);
+  }
+  textarea.disabled {
+    background: #ccc !important;
+    color: #777 !important;
+    pointer-events: none;
+  }
+
+  .placeholder-style {
+    font-size: 16px;
+    color: var(--subtle);
+    font-family: "Lato", sans-serif;
+    opacity: 0.7;
   }
 
   button {
@@ -46,88 +88,194 @@
     cursor: pointer;
     margin-top: 10px;
     font-size: 16px;
+    font-family: "Lato", sans-serif;
   }
+  button:disabled { background: #777; cursor: default; }
 
-  button:disabled {
-    background: #777;
-    cursor: default;
+  #stop {
+    background: #b40000;
+    display: none;
+    margin-left: 10px;
   }
 
   #status {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 10px;
+    font-size: 0.95em;
+    color: var(--subtle);
+    margin-top: 12px;
   }
 
   #ranking {
-    margin-top: 8px;
-    padding: 10px 12px;
-    background: #f0f0f0;
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 0.9em;
+    line-height: 1.4;
+    display: none;
   }
 
   #final-answer {
-    margin-top: 18px;
+    margin-top: 20px;
     padding: 18px;
-    background: #ffffff;
-    border: 1px solid #e3e3e3;
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 6px;
-    line-height: 1.5;
+    line-height: 1.55;
+  }
+
+  .typing {
+    display: inline-block;
+    width: 30px;
+    text-align: left;
+    letter-spacing: 3px;
+  }
+  @keyframes blink {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+  .typing span {
+    animation: blink 1.4s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  .transcript {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 14px;
+  }
+  .transcript summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .transcript-content {
+    margin-top: 10px;
+    color: var(--text);
   }
 
   footer {
-    margin-top: 24px;
+    margin-top: 35px;
     font-size: 0.8em;
-    color: #888;
+    color: var(--subtle);
     text-align: center;
   }
 </style>
 </head>
 <body>
 
-<h1>LLM Council - Secure Edition</h1>
-<p class="subtitle">
-  No API keys in the browser. All calls go through your private backend council
-  (Groq, OpenRouter, Gemini, DeepSeek). The council chooses one best answer and explains why.
-</p>
+<div class="dark-toggle" id="toggleDark">🌙</div>
 
-<textarea id="prompt" placeholder="Ask anything..."></textarea>
-<br />
-<button id="ask">Ask the Council</button>
+  <h1>LLM Council</h1>
 
-<div id="status">Status: Ready</div>
-<div id="ranking" style="display:none;"></div>
-<div id="final-answer">Waiting for your question...</div>
-
-<footer>
+<div class="subtitle">
+<br>
   Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B, LLaMA-3.1 8B Instruct,
   Kimi-K2, DeepSeek V3, Gemini Flash 2.0, DeepSeek Chat, DeepSeek Reasoner.
+</div>
+
+<textarea id="prompt" placeholder="Ask anything…"></textarea>
+<br>
+<button id="ask">Ask the Council</button>
+<button id="stop">Stop</button>
+
+<div id="status">Status: Ready</div>
+
+<div id="ranking"></div>
+
+<div id="final-answer" class="placeholder-style">Waiting for your question…</div>
+
+<footer>
+  Inspired by @karpathy’s original model. Adapted and designed by Kyle.
+<br><br>
+  <small>⚙️ 2025-2026</small>
 </footer>
 
 <script>
 const BACKEND_URL = "https://llm-council-backend-gyqc.onrender.com/council";
 
+let controller = null;
+
 const askBtn     = document.getElementById("ask");
+const stopBtn    = document.getElementById("stop");
 const promptBox  = document.getElementById("prompt");
 const statusDiv  = document.getElementById("status");
 const rankingDiv = document.getElementById("ranking");
 const finalDiv   = document.getElementById("final-answer");
+const toggleDark = document.getElementById("toggleDark");
 
-// Minimal markdown renderer
+// ---------- DARK MODE ICON TOGGLE ----------
+(function initTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    toggleDark.textContent = "☀️";
+  } else {
+    toggleDark.textContent = "🌙";
+  }
+})();
+
+toggleDark.onclick = () => {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.removeItem("theme");
+    toggleDark.textContent = "🌙";
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("theme", "dark");
+    toggleDark.textContent = "☀️";
+  }
+};
+
+// ---------- MARKDOWN RENDER ----------
 function renderMarkdown(text) {
   if (!text) return "";
   return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/`([^`]+)`/g, "<code style=\"background:#f4f4f4;padding:2px 4px;border-radius:4px;\">$1</code>")
-    .replace(/\n/g, "<br>");
+    .replace(/^###### (.*$)/gim, "<h6>$1</h6>")
+    .replace(/^##### (.*$)/gim, "<h5>$1</h5>")
+    .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
+    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+    .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/^\s*[-*] (.*)/gim, "<li>$1</li>")
+    .replace(/\n/gim, "<br>");
 }
 
-// Enter submits, Shift+Enter for newline
+// ---------- INPUT LOCK ----------
+function lockPrompt() {
+  promptBox.classList.add("disabled");
+  promptBox.setAttribute("disabled", true);
+}
+function unlockPrompt() {
+  promptBox.classList.remove("disabled");
+  promptBox.removeAttribute("disabled");
+}
+
+// ---------- TYPING DOTS ----------
+function typingDots() {
+  return `<span class="typing"><span>.</span><span>.</span><span>.</span></span>`;
+}
+
+// ---------- STOP BUTTON ----------
+stopBtn.onclick = () => {
+  if (controller) controller.abort();
+  statusDiv.textContent = "Stopped.";
+  finalDiv.textContent = "Generation stopped.";
+  finalDiv.classList.remove("placeholder-style");
+  askBtn.disabled = false;
+  stopBtn.style.display = "none";
+  unlockPrompt();
+};
+
+// ---------- ENTER SUBMIT ----------
 promptBox.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -135,70 +283,110 @@ promptBox.addEventListener("keydown", e => {
   }
 });
 
+// ---------- MAIN FLOW ----------
 askBtn.onclick = async () => {
-  const promptText = promptBox.value.trim();
-  if (!promptText) {
-    alert("Type a question first.");
+  const text = promptBox.value.trim();
+  if (!text) {
+    alert("Type something first.");
     return;
   }
 
+  controller = new AbortController();
+
   askBtn.disabled = true;
+  stopBtn.style.display = "inline-block";
+  lockPrompt();
+
   rankingDiv.style.display = "none";
   rankingDiv.innerHTML = "";
-  finalDiv.textContent = "Gathering council wisdom...";
-  statusDiv.textContent = "Thinking... council is deliberating.";
+  finalDiv.classList.remove("placeholder-style");
+  finalDiv.innerHTML = "Gathering council wisdom " + typingDots();
+  statusDiv.textContent = "Thinking… 0s";
 
   const start = Date.now();
   const timer = setInterval(() => {
-    const elapsed = Math.round((Date.now() - start) / 1000);
-    statusDiv.textContent = `Thinking... ${elapsed}s elapsed (multi-model council).`;
+    const s = Math.floor((Date.now() - start) / 1000);
+    statusDiv.textContent = `Thinking… ${s}s`;
   }, 1000);
 
   try {
-    const resp = await fetch(BACKEND_URL, {
+    const r = await fetch(BACKEND_URL, {
       method: "POST",
+      signal: controller.signal,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: promptText })
+      body: JSON.stringify({ prompt: text })
     });
 
-    const data = await resp.json();
+    const data = await r.json();
     clearInterval(timer);
+    stopBtn.style.display = "none";
 
     if (data.error) {
-      statusDiv.textContent = "Error from backend.";
-      finalDiv.textContent = data.error;
+      finalDiv.innerHTML = data.error;
+      statusDiv.textContent = "Error.";
       askBtn.disabled = false;
+      unlockPrompt();
       return;
     }
 
-    const usedCount      = data.modelsUsed ? data.modelsUsed.length : 0;
-    const attemptedCount = data.modelsAttempted ? data.modelsAttempted.length : usedCount;
+    const usedCount      = data.modelsUsed?.length || 0;
+    const attemptedCount = data.modelsAttempted?.length || usedCount;
 
     statusDiv.textContent =
-      `Done. Used ${usedCount}/${attemptedCount} models. Chairman: ${data.chairman || "Unknown"}.`;
+      `Done. Used ${usedCount}/${attemptedCount}. Chairman: ${data.chairman}.`;
 
-    if (data.ranking && data.ranking.length && data.bestIndex && data.bestModel) {
-      const rankLines = data.ranking
-        .map((pos, idx) => `#${idx + 1}: Answer ${pos}`)
-        .join(" | ");
+    // RANKING with % and avg confidence
+    if (data.ranking && data.ranking.length) {
+      const lines = data.ranking.map((pos, idx) => {
+        const ansIndex = pos - 1;
+        const model = data.modelsUsed[ansIndex] || "Unknown";
+        const pct = Array.isArray(data.percentages) && typeof data.percentages[ansIndex] === "number"
+          ? data.percentages[ansIndex]
+          : null;
+        const avgC = Array.isArray(data.avgConfidences) && typeof data.avgConfidences[ansIndex] === "number"
+          ? data.avgConfidences[ansIndex]
+          : null;
+
+        let extra = "";
+        if (pct !== null && avgC !== null) {
+          extra = ` — ${pct}% (avg conf: ${avgC.toFixed(2)})`;
+        } else if (pct !== null) {
+          extra = ` — ${pct}%`;
+        }
+        return `#${idx + 1}: ${model}${extra}`;
+      });
 
       rankingDiv.innerHTML =
-        `<strong>Council Ranks:</strong> ${rankLines}<br>` +
-        `<strong>Best:</strong> Answer ${data.bestIndex} (${data.bestModel})` +
-        (data.rankingReason ? `<br><strong>Reason:</strong> ${data.rankingReason}` : "");
+        `<strong>Council Ranks:</strong><br>` +
+        lines.join("<br>") +
+        `<br><strong>Reason:</strong> ${data.rankingReason || "N/A"}`;
       rankingDiv.style.display = "block";
-    } else {
-      rankingDiv.style.display = "none";
     }
 
+    // Final answer
     finalDiv.innerHTML = renderMarkdown(data.final || "No final answer returned.");
-  } catch (err) {
+
+    // Collapsible transcripts
+    if (Array.isArray(data.transcripts)) {
+      data.transcripts.forEach(t => {
+        const block = document.createElement("details");
+        block.className = "transcript";
+        block.innerHTML = `
+          <summary>${t.model}</summary>
+          <div class="transcript-content">${renderMarkdown(t.answer)}</div>
+        `;
+        finalDiv.appendChild(block);
+      });
+    }
+
+  } catch (e) {
     clearInterval(timer);
-    statusDiv.textContent = "Network error.";
-    finalDiv.textContent = "Could not reach backend.";
+    finalDiv.textContent = "Stopped or network error.";
   }
 
   askBtn.disabled = false;
+  unlockPrompt();
+  controller = null;
 };
 </script>
 
