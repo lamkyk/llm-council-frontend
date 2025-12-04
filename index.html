@@ -238,11 +238,68 @@
     50% { opacity: 1; }
     100% { opacity: 0.2; }
   }
+
+.info-icon {
+  font-family: Lato, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid #666;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  position: relative;
+}
+
+.info-icon:hover {
+  background: #666;
+  color: white;
+}
+
+.info-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 26px;
+  left: 0;
+  width: 260px;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  border-radius: 6px;
+  transition: opacity 0.25s ease;
+  z-index: 999;
+}
+
+.info-icon:hover .info-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 </style>
 </head>
 <body>
 
-<h1>LLM Council</h1>
+<h1 style="display:flex; align-items:center; gap:8px;">
+  LLM Council
+  <span class="info-icon">i
+    <span class="info-tooltip"> <br>
+      The LLM Council serves as an advisory board of models. Instead of relying on a single LLM, 
+      your question is evaluated by multiple different models independently. Each produces an 
+      initial answer, then anonymously reviews and ranks the others. Finally, a designated 
+      Chairman synthesizes these perspectives into one final high-signal response. This 
+      multi-model deliberation produces more reliable, insightful output than any single 
+      model alone.
+    </span>
+  </span>
+</h1>
+
 
 <div class="subtitle">
   Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B,
@@ -481,6 +538,10 @@ askBtn.onclick = async () => {
   }
 };
 </script>
+<footer style="margin-top:32px;text-align:center;font-size:11px;color:#777;font-family:Lato, sans-serif;">
+  Inspired by @karpathy’s original Council. Adapted and designed by Kyle.<br> <br>
+<small>⚙️ 2025-2026</small>
+</footer>
 
 </body>
 </html>
