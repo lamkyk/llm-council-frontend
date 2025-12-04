@@ -49,20 +49,22 @@ askBtn.onclick = async () => {
   statusDiv.textContent = "Thinking…";
   resultDiv.textContent = "Council is deliberating...";
 
-  try {
-    const r = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt })
-    });
+const promptText = promptBox.value.trim();
 
-    const data = await r.json();
+try {
+  const r = await fetch(BACKEND_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: promptText })
+  });
 
-    if (data.error) {
-      statusDiv.textContent = "Error from backend.";
-      resultDiv.textContent = data.error;
-      return;
-    }
+  const data = await r.json();
+
+  if (data.error) {
+    statusDiv.textContent = "Error from backend.";
+    resultDiv.textContent = data.error;
+    return;
+  }
 
     statusDiv.textContent = `Done. Models used: ${data.used}`;
     resultDiv.textContent = "Final answer:\n\n" + data.final;
