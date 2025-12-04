@@ -2,32 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>LLM Council (Frontend)</title>
+<title>LLM Council — Secure Edition</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
   body {
     font-family: Lato, sans-serif;
-    max-width: 800px;
+    max-width: 900px;
     margin: 40px auto;
     padding: 20px;
     background: #f9f9fb;
+    color: #111;
+  }
+
+  h1 {
+    margin-bottom: 4px;
   }
 
   textarea {
     width: 100%;
-    height: 120px;
+    height: 130px;
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 16px;
+    resize: vertical;
   }
 
   button {
-    padding: 12px 20px;
+    padding: 10px 20px;
     background: #333;
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -35,45 +41,88 @@
     font-size: 16px;
   }
 
-  #result {
+  button:disabled {
+    background: #777;
+    cursor: default;
+  }
+
+  #status {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 10px;
+  }
+
+  #final-answer {
     margin-top: 20px;
-    padding: 20px;
-    background: white;
-    border: 1px solid #eee;
+    padding: 18px;
+    background: #ffffff;
+    border: 1px solid #e3e3e3;
     border-radius: 6px;
     white-space: pre-wrap;
     line-height: 1.5;
   }
 
-  #status {
+  #ranking {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
     font-size: 0.9em;
-    color: #666;
-    margin-top: 10px;
+  }
+
+  .model-answer {
+    margin-top: 16px;
+    padding: 14px;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e5e5e5;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  .model-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  footer {
+    margin-top: 20px;
+    font-size: 0.8em;
+    color: #888;
+    text-align: center;
   }
 </style>
 </head>
-
 <body>
 
-<h2>LLM Council — Secure Edition</h2>
-<p>No API keys in the browser. All calls route through your private backend.</p>
+<h1>LLM Council — Secure Edition</h1>
+<p>No API keys in the browser. All calls route through your private backend council (Groq + OpenRouter).</p>
 
 <textarea id="prompt" placeholder="Ask anything…"></textarea>
-<br>
+<br />
 <button id="ask">Ask the Council</button>
 
 <div id="status">Status: Ready</div>
-<div id="result">Waiting…</div>
+
+<div id="final-answer">Waiting for your question…</div>
+<div id="ranking" style="display:none;"></div>
+<div id="answers"></div>
+
+<footer>
+  Adapted from Karpathy’s council idea. Backend: Groq + OpenRouter, 8-model council with ranking and chairman synthesis.
+</footer>
 
 <script>
 const BACKEND_URL = "https://llm-council-backend-gyqc.onrender.com/council";
 
-const askBtn = document.getElementById("ask");
-const promptBox = document.getElementById("prompt");
-const resultDiv = document.getElementById("result");
-const statusDiv = document.getElementById("status");
+const askBtn     = document.getElementById("ask");
+const promptBox  = document.getElementById("prompt");
+const statusDiv  = document.getElementById("status");
+const finalDiv   = document.getElementById("final-answer");
+const rankingDiv = document.getElementById("ranking");
+const answersDiv = document.getElementById("answers");
 
-// Allow Enter to submit
+// Enter to send
 promptBox.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -88,8 +137,17 @@ askBtn.onclick = async () => {
     return;
   }
 
-  statusDiv.textContent = "Thinking…";
-  resultDiv.textContent = "Council is deliberating...";
+  askBtn.disabled = true;
+  statusDiv.textContent = "Thinking… council is deliberating (this may take 30–120 seconds).";
+  finalDiv.textContent = "Gathering council wisdom...";
+  rankingDiv.style.display = "none";
+  answersDiv.innerHTML = "";
+
+  const start = Date.now();
+  const timer = setInterval(() => {
+    const elapsed = Math.round((Date.now() - start) / 1000);
+    statusDiv.textContent = `Thinking… ${elapsed}s elapsed (multi-model council).`;
+  }, 1000);
 
   try {
     const r = await fetch(BACKEND_URL, {
@@ -100,23 +158,61 @@ askBtn.onclick = async () => {
 
     const data = await r.json();
 
+    clearInterval(timer);
+
     if (data.error) {
       statusDiv.textContent = "Error from backend.";
-      resultDiv.textContent = data.error;
+      finalDiv.textContent = data.error;
+      askBtn.disabled = false;
       return;
     }
 
-    // SUCCESS — display models used + responses
-    statusDiv.textContent = `Done. Models used: ${data.modelsUsed.join(", ")}`;
+    const usedCount = data.modelsUsed ? data.modelsUsed.length : 0;
+    statusDiv.textContent =
+      `Done. Used ${usedCount} models. Chairman: ${data.chairman || "Unknown"}.`;
 
-    resultDiv.innerHTML =
-      `<strong>Groq Response:</strong><br>${data.answers.groq}<br><br>` +
-      `<strong>OpenRouter Response:</strong><br>${data.answers.openrouter}`;
+    // Final answer at top
+    finalDiv.textContent = data.final || "(No final answer returned.)";
+
+    // Ranking display
+    if (data.ranking && data.ranking.length && data.answers) {
+      const rankLines = data.ranking
+        .map((pos, idx) => {
+          const ans = data.answers[pos - 1];
+          if (!ans) return null;
+          return `#${idx + 1}: Answer ${pos} (${ans.label})`;
+        })
+        .filter(Boolean)
+        .join(" | ");
+
+      rankingDiv.innerHTML =
+        `<strong>Council ranking:</strong> ${rankLines}<br>` +
+        `<strong>Reason:</strong> ${data.rankingReason || "N/A"}`;
+      rankingDiv.style.display = "block";
+    } else {
+      rankingDiv.style.display = "none";
+    }
+
+    // Per-model answers
+    answersDiv.innerHTML = "";
+    if (data.answers && data.answers.length) {
+      data.answers.forEach((ans, i) => {
+        const div = document.createElement("div");
+        div.className = "model-answer";
+        div.innerHTML =
+          `<div class="model-title">Answer ${i + 1}: ${ans.label}</div>` +
+          `<div>${ans.text}</div>`;
+        answersDiv.appendChild(div);
+      });
+    }
 
   } catch (err) {
+    clearInterval(timer);
     statusDiv.textContent = "Network error.";
-    resultDiv.textContent = "Could not reach backend.";
+    finalDiv.textContent = "Could not reach backend.";
   }
+
+  askBtn.disabled = false;
 };
 </script>
 
