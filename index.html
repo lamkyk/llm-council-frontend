@@ -30,10 +30,12 @@
   .subtitle {
     font-size: 0.9em;
     color: var(--subtle);
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
 
-  .prompt-wrap { position: relative; }
+  .prompt-wrap {
+    position: relative;
+  }
 
   textarea {
     width: 100%;
@@ -41,11 +43,10 @@
     padding: 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
-    background: #ffffffaa;
+    background: #ffffff;
     color: var(--text);
     font-size: 16px;
   }
-
   textarea.disabled {
     background: #e6e6e6;
     color: #777;
@@ -64,8 +65,8 @@
   }
 
   button {
-    background: #222;
-    color: white;
+    background: #000;
+    color: #fff;
     border: none;
     border-radius: 6px;
     padding: 10px 22px;
@@ -73,84 +74,180 @@
     font-size: 16px;
     margin-top: 12px;
   }
-
+  button:hover:enabled { background: #111; }
   button:disabled {
     background: #555;
+    cursor: not-allowed;
   }
 
-  /* Status bar */
+  /* Status box */
   #status-box {
-    margin-top: 18px;
-    padding: 14px 18px;
-    background: #ffffffcc;
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.92em;
+  }
+  #status-line {
+    color: #666;
+    margin-bottom: 4px;
+  }
+  #status-subline {
+    color: var(--placeholder);
+  }
+
+  .placeholder-style {
+    color: var(--placeholder);
+  }
+
+  /* Inline ranks under status */
+  #inline-ranks {
+    margin-top: 10px;
+    font-size: 0.9em;
     color: var(--subtle);
   }
 
-  /* Final answer */
-  #answer-box {
-    margin-top: 22px;
-    padding: 20px;
-    background: #ffffffcc;
-    border: 1px solid var(--border);
+  /* Final answer card (hidden until response) */
+  #answer-card {
+    margin-top: 14px;
+    padding: 18px;
+    background: #ffffff;
     border-radius: 8px;
+    border: 1px solid var(--border);
     line-height: 1.55;
-    display: none; /* HIDDEN until we have real response */
+    display: none; /* key: hidden until we have an answer */
   }
 
   #answer-content {
-    font-size: 1em;
     color: #000;
-    margin-top: 8px;
+    font-size: 1em;
   }
-
-  /* Fix excess spacing */
   #answer-content br + br { display: none; }
-
   #answer-content strong { font-size: 1.05em; }
-
-  #answer-content ul, #answer-content ol {
+  #answer-content ul,
+  #answer-content ol {
     margin: 6px 0;
     padding-left: 20px;
   }
 
-  /* Ranking drawer */
-  #ranking {
-    margin-top: 14px;
-    padding: 14px;
-    background: #ffffffcc;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+  /* Modern collapsible transcripts */
+  .transcript-card {
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #e3e3e3;
+    background: #fcfcfc;
+    overflow: hidden;
+  }
+  .transcript-header {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  .transcript-header span.model {
+    font-weight: 600;
+    flex: 1;
+  }
+  .transcript-header span.meta {
+    font-size: 0.8em;
+    color: var(--subtle);
+    margin-right: 6px;
+  }
+  .transcript-header span.chevron {
+    font-size: 0.8em;
+    transition: transform 0.15s ease;
+  }
+  .transcript-body {
+    padding: 10px 12px 12px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    display: none;
+  }
+  .transcript-card.open .transcript-body {
+    display: block;
+  }
+  .transcript-card.open .transcript-header .chevron {
+    transform: rotate(90deg);
+  }
+
+  /* Sliding ranking panel */
+  #ranking-toggle {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--subtle);
+    cursor: pointer;
+    text-decoration: underline;
     display: none;
   }
 
-  details.transcript {
-    margin-top: 12px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 14px;
+  #ranking-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: #f7f7f7;
+    border-left: 1px solid #ccc;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    padding: 16px;
+    overflow-y: auto;
+    z-index: 9999;
+    font-size: 0.9em;
   }
-
-  summary {
+  #ranking-panel.open {
+    transform: translateX(0);
+  }
+  #ranking-close {
+    text-align: right;
     cursor: pointer;
-    font-weight: 700;
-    font-size: 0.95em;
+    margin-bottom: 6px;
+  }
+  #ranking-body h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  .ranking-row {
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e2e2;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .ranking-row strong {
+    display: block;
+    margin-bottom: 2px;
+  }
+  .ranking-row span.meta {
+    font-size: 0.8em;
+    color: var(--subtle);
   }
 
+  /* Dots animation */
+  .dots span {
+    animation: blink 1.2s infinite;
+    opacity: 0.2;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
 </style>
 </head>
-
 <body>
 
 <h1>LLM Council</h1>
 
 <div class="subtitle">
   Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B,
-  LLaMA-3.1 8B Instruct, Kimi-K2, DeepSeek V3, Gemini Flash 2.0,
-  DeepSeek Chat, DeepSeek Reasoner.
+  LLaMA-3.1 8B Instruct, Kimi-K2, DeepSeek V3, DeepSeek Chat,
+  DeepSeek Reasoner, Gemini Flash 2.0.
 </div>
 
 <div class="prompt-wrap">
@@ -160,14 +257,22 @@
 
 <button id="ask">Ask the Council</button>
 
-<!-- STATUS BAR -->
-<div id="status-box">Status: Ready</div>
+<div id="status-box">
+  <div id="status-line" class="placeholder-style">Status: Ready</div>
+  <div id="status-subline" class="placeholder-style">Waiting for your question…</div>
+</div>
 
-<!-- RANKING + FINAL ANSWER -->
-<div id="ranking"></div>
+<div id="inline-ranks"></div>
 
-<div id="answer-box">
+<div id="answer-card">
   <div id="answer-content"></div>
+  <div id="ranking-toggle">View council details ▸</div>
+  <div id="transcripts"></div>
+</div>
+
+<div id="ranking-panel">
+  <div id="ranking-close">✕</div>
+  <div id="ranking-body"></div>
 </div>
 
 <script>
@@ -176,6 +281,7 @@ const BACKEND_URL = "https://llm-council-backend-gyqc.onrender.com/council";
 function md(text) {
   return text
     .trim()
+    .replace(/^\s*\n+/g, "")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
@@ -183,20 +289,31 @@ function md(text) {
     .replace(/\n/g, "<br>");
 }
 
-const askBtn = document.getElementById("ask");
-const promptBox = document.getElementById("prompt");
-const stopIcon = document.getElementById("stop-icon");
-const statusBox = document.getElementById("status-box");
-const answerBox = document.getElementById("answer-box");
+const askBtn        = document.getElementById("ask");
+const promptBox     = document.getElementById("prompt");
+const stopIcon      = document.getElementById("stop-icon");
+const statusLine    = document.getElementById("status-line");
+const statusSubline = document.getElementById("status-subline");
+const inlineRanks   = document.getElementById("inline-ranks");
+const answerCard    = document.getElementById("answer-card");
 const answerContent = document.getElementById("answer-content");
-const rankingDiv = document.getElementById("ranking");
+const transcriptsDiv= document.getElementById("transcripts");
+const rankingToggle = document.getElementById("ranking-toggle");
+const rankingPanel  = document.getElementById("ranking-panel");
+const rankingClose  = document.getElementById("ranking-close");
+const rankingBody   = document.getElementById("ranking-body");
 
 let controller = null;
-let thinkingInterval = null;
-let thinkingStart = 0;
+let timerId    = null;
 
-function lockPrompt() { promptBox.readOnly = true; promptBox.classList.add("disabled"); }
-function unlockPrompt() { promptBox.readOnly = false; promptBox.classList.remove("disabled"); }
+function lockPrompt() {
+  promptBox.classList.add("disabled");
+  promptBox.disabled = true;
+}
+function unlockPrompt() {
+  promptBox.classList.remove("disabled");
+  promptBox.disabled = false;
+}
 
 promptBox.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
@@ -207,36 +324,48 @@ promptBox.addEventListener("keydown", e => {
 
 stopIcon.onclick = () => {
   if (controller) controller.abort();
-  clearInterval(thinkingInterval);
+  if (timerId) clearInterval(timerId);
   stopIcon.style.display = "none";
+  askBtn.disabled = false;
   unlockPrompt();
-  statusBox.textContent = "Stopped.";
+  statusLine.textContent    = "Stopped.";
+  statusSubline.textContent = "";
 };
 
-function startThinking() {
-  thinkingStart = Date.now();
-  thinkingInterval = setInterval(() => {
-    const sec = Math.floor((Date.now() - thinkingStart) / 1000);
-    statusBox.textContent = `Council is thinking… ${sec}s`;
-  }, 1000);
-}
+rankingToggle.onclick = () => rankingPanel.classList.add("open");
+rankingClose.onclick  = () => rankingPanel.classList.remove("open");
 
 askBtn.onclick = async () => {
   const prompt = promptBox.value.trim();
-  if (!prompt) return alert("Type something first.");
+  if (!prompt) {
+    alert("Type a question first.");
+    return;
+  }
 
   controller = new AbortController();
-
   askBtn.disabled = true;
-  stopIcon.style.display = "block";
   lockPrompt();
+  stopIcon.style.display = "block";
 
-  answerBox.style.display = "none";
-  rankingDiv.style.display = "none";
+  // reset UI
+  rankingToggle.style.display = "none";
+  rankingPanel.classList.remove("open");
+  rankingBody.innerHTML = "";
+  transcriptsDiv.innerHTML = "";
+  inlineRanks.textContent = "";
+  answerCard.style.display = "none";
   answerContent.innerHTML = "";
 
-  statusBox.textContent = "Council is thinking…";
-  startThinking();
+  statusLine.textContent = "Thinking… 0s (council may take 20–60s)";
+  statusLine.classList.remove("placeholder-style");
+  statusSubline.innerHTML =
+    `<span class="placeholder-style">Council is thinking<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>`;
+
+  const start = Date.now();
+  timerId = setInterval(() => {
+    const s = Math.floor((Date.now() - start) / 1000);
+    statusLine.textContent = `Thinking… ${s}s (council may take 20–60s)`;
+  }, 1000);
 
   try {
     const r = await fetch(BACKEND_URL, {
@@ -247,58 +376,108 @@ askBtn.onclick = async () => {
     });
 
     const data = await r.json();
-    clearInterval(thinkingInterval);
+    if (timerId) clearInterval(timerId);
     stopIcon.style.display = "none";
     askBtn.disabled = false;
     unlockPrompt();
 
     if (data.error) {
-      statusBox.textContent = "Error: " + data.error;
+      statusLine.textContent    = "Error.";
+      statusSubline.textContent = "";
       return;
     }
 
-    statusBox.textContent =
-      `Done. Used ${data.modelsUsed.length} models. Chairman: ${data.chairman}`;
+    const used  = data.modelsUsed?.length || 0;
+    const total = data.modelsAttempted?.length || used;
 
-    /* SHOW ANSWER BOX */
-    answerBox.style.display = "block";
-    answerContent.style.display = "block";
-    answerContent.innerHTML = md(data.final);
+    statusLine.textContent = `Done. Used ${used}/${total}. Chairman: ${data.chairman}`;
+    statusSubline.textContent = "";
 
-    /* BUILD RANKING */
-    rankingDiv.style.display = "block";
-    rankingDiv.innerHTML =
-      `<strong>Council Ranks</strong><br><br>` +
-      data.ranking
-        .map((rank, i) => {
-          const model = data.modelsUsed[rank - 1];
-          const pct = data.percentages[rank - 1];
-          const avg = data.avgConf[rank - 1];
-          return `#${i + 1}: ${model} — ${pct}% (avg conf ${avg})`;
-        })
-        .join("<br>");
+    // show answer card
+    answerCard.style.display = "block";
+    answerContent.innerHTML = md(data.final || "No final answer.");
 
-    /* TRANSCRIPTS */
-    data.transcripts.forEach(t => {
-      const box = document.createElement("details");
-      box.className = "transcript";
-      const sm = document.createElement("summary");
-      sm.textContent = `Model Transcript — ${t.model}`;
-      box.appendChild(sm);
+    // inline ranks (top 3)
+    if (data.ranking && data.ranking.length) {
+      const lines = data.ranking.slice(0, 3).map((pos, i) => {
+        const idx   = pos - 1;
+        const model = data.modelsUsed[idx];
+        const pct   = data.percentages[idx];
+        const conf  = data.avgConfidences[idx]?.toFixed(2);
+        return `#${i + 1}: ${model} — ${pct}% (avg conf ${conf})`;
+      });
+      inlineRanks.innerHTML = lines.join("<br>");
+    }
 
-      const inner = document.createElement("div");
-      inner.innerHTML = md(t.text);
-      box.appendChild(inner);
+    // ranking panel content
+    if (data.ranking && data.ranking.length) {
+      let html = `<h3>Council ranking</h3>`;
+      data.ranking.forEach((pos, i) => {
+        const idx   = pos - 1;
+        const model = data.modelsUsed[idx];
+        const pct   = data.percentages[idx];
+        const conf  = data.avgConfidences[idx]?.toFixed(2);
+        html += `
+          <div class="ranking-row">
+            <strong>#${i + 1} — ${model}</strong>
+            <span class="meta">Weighted: ${pct}% · Avg conf: ${conf}</span>
+          </div>
+        `;
+      });
+      html += `<p><strong>Reason:</strong> ${data.rankingReason || "N/A"}</p>`;
+      rankingBody.innerHTML = html;
+      rankingToggle.style.display = "inline-block";
+    }
 
-      rankingDiv.appendChild(box);
-    });
+    // transcripts as collapsible cards
+    if (Array.isArray(data.transcripts)) {
+      data.transcripts.forEach((t) => {
+        const card = document.createElement("div");
+        card.className = "transcript-card";
+
+        const header = document.createElement("div");
+        header.className = "transcript-header";
+
+        const modelSpan = document.createElement("span");
+        modelSpan.className = "model";
+        modelSpan.textContent = t.model;
+
+        const metaSpan = document.createElement("span");
+        metaSpan.className = "meta";
+        const idx = data.modelsUsed.indexOf(t.model);
+        if (idx !== -1) {
+          const pct  = data.percentages[idx];
+          const conf = data.avgConfidences[idx]?.toFixed(2);
+          metaSpan.textContent = `Score: ${pct}% · Conf: ${conf}`;
+        }
+
+        const chev = document.createElement("span");
+        chev.className = "chevron";
+        chev.textContent = "▸";
+
+        header.appendChild(modelSpan);
+        header.appendChild(metaSpan);
+        header.appendChild(chev);
+
+        const body = document.createElement("div");
+        body.className = "transcript-body";
+        body.innerHTML = md(t.answer);
+
+        header.onclick = () => card.classList.toggle("open");
+
+        card.appendChild(header);
+        card.appendChild(body);
+        transcriptsDiv.appendChild(card);
+      });
+    }
 
   } catch (err) {
-    clearInterval(thinkingInterval);
-    statusBox.textContent = "Network error or stopped.";
+    if (timerId) clearInterval(timerId);
     stopIcon.style.display = "none";
-    unlockPrompt();
     askBtn.disabled = false;
+    unlockPrompt();
+    statusLine.textContent    = "Network error or stopped.";
+    statusSubline.textContent = "";
   }
 };
 </script>
