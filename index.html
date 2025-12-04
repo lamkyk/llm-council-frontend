@@ -8,274 +8,196 @@
 
 <style>
   :root {
-    --bg: #f9f9fb;
-    --text: #111;
-    --panel: white;
-    --border: #ddd;
-    --subtle: #666;
-  }
-  [data-theme='dark'] {
-    --bg: #111;
-    --text: #eee;
-    --panel: #1c1c1c;
-    --border: #333;
-    --subtle: #aaa;
+    --bg: transparent;
+    --text: #222;
+    --panel: #ffffff;
+    --border: #e0e0e0;
+    --subtle: #777;
+    --placeholder: #9a9a9a;
   }
 
   body {
     font-family: "Lato", sans-serif;
-    max-width: 900px;
+    max-width: 860px;
     margin: 40px auto;
     padding: 20px;
-    background: var(--bg);
+    background: transparent;
     color: var(--text);
-    transition: background 0.3s, color 0.3s;
-    position: relative;
   }
 
-  h1 { margin-bottom: 6px; }
+  h1 { margin-bottom: 6px; font-weight: 800; }
 
   .subtitle {
     font-size: 0.9em;
     color: var(--subtle);
-    margin-bottom: 20px;
-    margin-top: -6px;
+    margin-bottom: 22px;
   }
 
-  .dark-toggle {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 20px;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    padding: 4px;
-    user-select: none;
-  }
+  .prompt-wrap { position: relative; }
 
   textarea {
     width: 100%;
-    height: 130px;
+    height: 125px;
     padding: 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
-    font-size: 16px;
-    resize: vertical;
-    font-family: "Lato", sans-serif;
-    background: var(--panel);
+    background: #ffffffaa;
     color: var(--text);
-  }
-  textarea.disabled {
-    background: #ccc !important;
-    color: #777 !important;
-    pointer-events: none;
+    font-size: 16px;
   }
 
-  .placeholder-style {
-    font-size: 16px;
-    color: var(--subtle);
-    font-family: "Lato", sans-serif;
-    opacity: 0.7;
+  textarea.disabled {
+    background: #e6e6e6;
+    color: #777;
+  }
+
+  #stop-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    width: 18px;
+    height: 18px;
+    background: #444;
+    border-radius: 3px;
+    cursor: pointer;
+    display: none;
   }
 
   button {
-    padding: 10px 22px;
-    background: #333;
-    color: #fff;
+    background: #222;
+    color: white;
     border: none;
     border-radius: 6px;
+    padding: 10px 22px;
     cursor: pointer;
-    margin-top: 10px;
     font-size: 16px;
-    font-family: "Lato", sans-serif;
-  }
-  button:disabled { background: #777; cursor: default; }
-
-  #stop {
-    background: #b40000;
-    display: none;
-    margin-left: 10px;
+    margin-top: 12px;
   }
 
-  #status {
-    font-size: 0.95em;
+  button:disabled {
+    background: #555;
+  }
+
+  /* Status bar */
+  #status-box {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: #ffffffcc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92em;
     color: var(--subtle);
-    margin-top: 12px;
   }
 
-  #ranking {
-    margin-top: 12px;
-    padding: 12px;
-    background: var(--panel);
+  /* Final answer */
+  #answer-box {
+    margin-top: 22px;
+    padding: 20px;
+    background: #ffffffcc;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 0.9em;
-    line-height: 1.4;
-    display: none;
-  }
-
-  #final-answer {
-    margin-top: 20px;
-    padding: 18px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     line-height: 1.55;
+    display: none; /* HIDDEN until we have real response */
   }
 
-  .typing {
-    display: inline-block;
-    width: 30px;
-    text-align: left;
-    letter-spacing: 3px;
+  #answer-content {
+    font-size: 1em;
+    color: #000;
+    margin-top: 8px;
   }
-  @keyframes blink {
-    0% { opacity: 0.2; }
-    50% { opacity: 1; }
-    100% { opacity: 0.2; }
-  }
-  .typing span {
-    animation: blink 1.4s infinite;
-  }
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
 
-  .transcript {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: 6px;
+  /* Fix excess spacing */
+  #answer-content br + br { display: none; }
+
+  #answer-content strong { font-size: 1.05em; }
+
+  #answer-content ul, #answer-content ol {
+    margin: 6px 0;
+    padding-left: 20px;
+  }
+
+  /* Ranking drawer */
+  #ranking {
     margin-top: 14px;
-  }
-  .transcript summary {
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .transcript-content {
-    margin-top: 10px;
-    color: var(--text);
+    padding: 14px;
+    background: #ffffffcc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: none;
   }
 
-  footer {
-    margin-top: 35px;
-    font-size: 0.8em;
-    color: var(--subtle);
-    text-align: center;
+  details.transcript {
+    margin-top: 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
   }
+
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95em;
+  }
+
 </style>
 </head>
+
 <body>
 
-<div class="dark-toggle" id="toggleDark">🌙</div>
-
-  <h1>LLM Council</h1>
+<h1>LLM Council</h1>
 
 <div class="subtitle">
-<br>
-  Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B, LLaMA-3.1 8B Instruct,
-  Kimi-K2, DeepSeek V3, Gemini Flash 2.0, DeepSeek Chat, DeepSeek Reasoner.
+  Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B,
+  LLaMA-3.1 8B Instruct, Kimi-K2, DeepSeek V3, Gemini Flash 2.0,
+  DeepSeek Chat, DeepSeek Reasoner.
 </div>
 
-<textarea id="prompt" placeholder="Ask anything…"></textarea>
-<br>
+<div class="prompt-wrap">
+  <textarea id="prompt" placeholder="Ask anything…"></textarea>
+  <div id="stop-icon"></div>
+</div>
+
 <button id="ask">Ask the Council</button>
-<button id="stop">Stop</button>
 
-<div id="status">Status: Ready</div>
+<!-- STATUS BAR -->
+<div id="status-box">Status: Ready</div>
 
+<!-- RANKING + FINAL ANSWER -->
 <div id="ranking"></div>
 
-<div id="final-answer" class="placeholder-style">Waiting for your question…</div>
-
-<footer>
-  Inspired by @karpathy’s original model. Adapted and designed by Kyle.
-<br><br>
-  <small>⚙️ 2025-2026</small>
-</footer>
+<div id="answer-box">
+  <div id="answer-content"></div>
+</div>
 
 <script>
 const BACKEND_URL = "https://llm-council-backend-gyqc.onrender.com/council";
 
-let controller = null;
-
-const askBtn     = document.getElementById("ask");
-const stopBtn    = document.getElementById("stop");
-const promptBox  = document.getElementById("prompt");
-const statusDiv  = document.getElementById("status");
-const rankingDiv = document.getElementById("ranking");
-const finalDiv   = document.getElementById("final-answer");
-const toggleDark = document.getElementById("toggleDark");
-
-// ---------- DARK MODE ICON TOGGLE ----------
-(function initTheme() {
-  const saved = localStorage.getItem("theme");
-  if (saved === "dark") {
-    document.documentElement.setAttribute("data-theme", "dark");
-    toggleDark.textContent = "☀️";
-  } else {
-    toggleDark.textContent = "🌙";
-  }
-})();
-
-toggleDark.onclick = () => {
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-  if (isDark) {
-    document.documentElement.removeAttribute("data-theme");
-    localStorage.removeItem("theme");
-    toggleDark.textContent = "🌙";
-  } else {
-    document.documentElement.setAttribute("data-theme", "dark");
-    localStorage.setItem("theme", "dark");
-    toggleDark.textContent = "☀️";
-  }
-};
-
-// ---------- MARKDOWN RENDER ----------
-function renderMarkdown(text) {
-  if (!text) return "";
+function md(text) {
   return text
-    .replace(/^###### (.*$)/gim, "<h6>$1</h6>")
-    .replace(/^##### (.*$)/gim, "<h5>$1</h5>")
-    .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
-    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-    .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/gim, "<em>$1</em>")
+    .trim()
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/^\s*[-*] (.*)/gim, "<li>$1</li>")
-    .replace(/\n/gim, "<br>");
+    .replace(/\n/g, "<br>");
 }
 
-// ---------- INPUT LOCK ----------
-function lockPrompt() {
-  promptBox.classList.add("disabled");
-  promptBox.setAttribute("disabled", true);
-}
-function unlockPrompt() {
-  promptBox.classList.remove("disabled");
-  promptBox.removeAttribute("disabled");
-}
+const askBtn = document.getElementById("ask");
+const promptBox = document.getElementById("prompt");
+const stopIcon = document.getElementById("stop-icon");
+const statusBox = document.getElementById("status-box");
+const answerBox = document.getElementById("answer-box");
+const answerContent = document.getElementById("answer-content");
+const rankingDiv = document.getElementById("ranking");
 
-// ---------- TYPING DOTS ----------
-function typingDots() {
-  return `<span class="typing"><span>.</span><span>.</span><span>.</span></span>`;
-}
+let controller = null;
+let thinkingInterval = null;
+let thinkingStart = 0;
 
-// ---------- STOP BUTTON ----------
-stopBtn.onclick = () => {
-  if (controller) controller.abort();
-  statusDiv.textContent = "Stopped.";
-  finalDiv.textContent = "Generation stopped.";
-  finalDiv.classList.remove("placeholder-style");
-  askBtn.disabled = false;
-  stopBtn.style.display = "none";
-  unlockPrompt();
-};
+function lockPrompt() { promptBox.readOnly = true; promptBox.classList.add("disabled"); }
+function unlockPrompt() { promptBox.readOnly = false; promptBox.classList.remove("disabled"); }
 
-// ---------- ENTER SUBMIT ----------
 promptBox.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -283,110 +205,101 @@ promptBox.addEventListener("keydown", e => {
   }
 });
 
-// ---------- MAIN FLOW ----------
+stopIcon.onclick = () => {
+  if (controller) controller.abort();
+  clearInterval(thinkingInterval);
+  stopIcon.style.display = "none";
+  unlockPrompt();
+  statusBox.textContent = "Stopped.";
+};
+
+function startThinking() {
+  thinkingStart = Date.now();
+  thinkingInterval = setInterval(() => {
+    const sec = Math.floor((Date.now() - thinkingStart) / 1000);
+    statusBox.textContent = `Council is thinking… ${sec}s`;
+  }, 1000);
+}
+
 askBtn.onclick = async () => {
-  const text = promptBox.value.trim();
-  if (!text) {
-    alert("Type something first.");
-    return;
-  }
+  const prompt = promptBox.value.trim();
+  if (!prompt) return alert("Type something first.");
 
   controller = new AbortController();
 
   askBtn.disabled = true;
-  stopBtn.style.display = "inline-block";
+  stopIcon.style.display = "block";
   lockPrompt();
 
+  answerBox.style.display = "none";
   rankingDiv.style.display = "none";
-  rankingDiv.innerHTML = "";
-  finalDiv.classList.remove("placeholder-style");
-  finalDiv.innerHTML = "Gathering council wisdom " + typingDots();
-  statusDiv.textContent = "Thinking… 0s";
+  answerContent.innerHTML = "";
 
-  const start = Date.now();
-  const timer = setInterval(() => {
-    const s = Math.floor((Date.now() - start) / 1000);
-    statusDiv.textContent = `Thinking… ${s}s`;
-  }, 1000);
+  statusBox.textContent = "Council is thinking…";
+  startThinking();
 
   try {
     const r = await fetch(BACKEND_URL, {
       method: "POST",
       signal: controller.signal,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: text })
+      body: JSON.stringify({ prompt })
     });
 
     const data = await r.json();
-    clearInterval(timer);
-    stopBtn.style.display = "none";
+    clearInterval(thinkingInterval);
+    stopIcon.style.display = "none";
+    askBtn.disabled = false;
+    unlockPrompt();
 
     if (data.error) {
-      finalDiv.innerHTML = data.error;
-      statusDiv.textContent = "Error.";
-      askBtn.disabled = false;
-      unlockPrompt();
+      statusBox.textContent = "Error: " + data.error;
       return;
     }
 
-    const usedCount      = data.modelsUsed?.length || 0;
-    const attemptedCount = data.modelsAttempted?.length || usedCount;
+    statusBox.textContent =
+      `Done. Used ${data.modelsUsed.length} models. Chairman: ${data.chairman}`;
 
-    statusDiv.textContent =
-      `Done. Used ${usedCount}/${attemptedCount}. Chairman: ${data.chairman}.`;
+    /* SHOW ANSWER BOX */
+    answerBox.style.display = "block";
+    answerContent.style.display = "block";
+    answerContent.innerHTML = md(data.final);
 
-    // RANKING with % and avg confidence
-    if (data.ranking && data.ranking.length) {
-      const lines = data.ranking.map((pos, idx) => {
-        const ansIndex = pos - 1;
-        const model = data.modelsUsed[ansIndex] || "Unknown";
-        const pct = Array.isArray(data.percentages) && typeof data.percentages[ansIndex] === "number"
-          ? data.percentages[ansIndex]
-          : null;
-        const avgC = Array.isArray(data.avgConfidences) && typeof data.avgConfidences[ansIndex] === "number"
-          ? data.avgConfidences[ansIndex]
-          : null;
+    /* BUILD RANKING */
+    rankingDiv.style.display = "block";
+    rankingDiv.innerHTML =
+      `<strong>Council Ranks</strong><br><br>` +
+      data.ranking
+        .map((rank, i) => {
+          const model = data.modelsUsed[rank - 1];
+          const pct = data.percentages[rank - 1];
+          const avg = data.avgConf[rank - 1];
+          return `#${i + 1}: ${model} — ${pct}% (avg conf ${avg})`;
+        })
+        .join("<br>");
 
-        let extra = "";
-        if (pct !== null && avgC !== null) {
-          extra = ` — ${pct}% (avg conf: ${avgC.toFixed(2)})`;
-        } else if (pct !== null) {
-          extra = ` — ${pct}%`;
-        }
-        return `#${idx + 1}: ${model}${extra}`;
-      });
+    /* TRANSCRIPTS */
+    data.transcripts.forEach(t => {
+      const box = document.createElement("details");
+      box.className = "transcript";
+      const sm = document.createElement("summary");
+      sm.textContent = `Model Transcript — ${t.model}`;
+      box.appendChild(sm);
 
-      rankingDiv.innerHTML =
-        `<strong>Council Ranks:</strong><br>` +
-        lines.join("<br>") +
-        `<br><strong>Reason:</strong> ${data.rankingReason || "N/A"}`;
-      rankingDiv.style.display = "block";
-    }
+      const inner = document.createElement("div");
+      inner.innerHTML = md(t.text);
+      box.appendChild(inner);
 
-    // Final answer
-    finalDiv.innerHTML = renderMarkdown(data.final || "No final answer returned.");
+      rankingDiv.appendChild(box);
+    });
 
-    // Collapsible transcripts
-    if (Array.isArray(data.transcripts)) {
-      data.transcripts.forEach(t => {
-        const block = document.createElement("details");
-        block.className = "transcript";
-        block.innerHTML = `
-          <summary>${t.model}</summary>
-          <div class="transcript-content">${renderMarkdown(t.answer)}</div>
-        `;
-        finalDiv.appendChild(block);
-      });
-    }
-
-  } catch (e) {
-    clearInterval(timer);
-    finalDiv.textContent = "Stopped or network error.";
+  } catch (err) {
+    clearInterval(thinkingInterval);
+    statusBox.textContent = "Network error or stopped.";
+    stopIcon.style.display = "none";
+    unlockPrompt();
+    askBtn.disabled = false;
   }
-
-  askBtn.disabled = false;
-  unlockPrompt();
-  controller = null;
 };
 </script>
 
