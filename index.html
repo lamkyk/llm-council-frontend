@@ -8,7 +8,7 @@
 
 <style>
   body {
-    font-family: Lato, sans-serif;
+    font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
@@ -18,6 +18,13 @@
 
   h1 {
     margin-bottom: 4px;
+  }
+
+  p.subtitle {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+    color: #555;
   }
 
   textarea {
@@ -31,7 +38,7 @@
   }
 
   button {
-    padding: 10px 20px;
+    padding: 10px 22px;
     background: #333;
     color: #fff;
     border: none;
@@ -70,6 +77,10 @@
     font-size: 0.9em;
   }
 
+  #answers {
+    margin-top: 10px;
+  }
+
   .model-answer {
     margin-top: 16px;
     padding: 14px;
@@ -86,7 +97,7 @@
   }
 
   footer {
-    margin-top: 20px;
+    margin-top: 24px;
     font-size: 0.8em;
     color: #888;
     text-align: center;
@@ -96,7 +107,10 @@
 <body>
 
 <h1>LLM Council — Secure Edition</h1>
-<p>No API keys in the browser. All calls route through your private backend council (Groq + OpenRouter).</p>
+<p class="subtitle">
+  No API keys in the browser. All calls go through your private backend council
+  (Groq + OpenRouter, multiple free models with staggered calls and retries).
+</p>
 
 <textarea id="prompt" placeholder="Ask anything…"></textarea>
 <br />
@@ -109,7 +123,7 @@
 <div id="answers"></div>
 
 <footer>
-  Adapted from Karpathy’s council idea. Backend: Groq + OpenRouter, 8-model council with ranking and chairman synthesis.
+  Adapted from Karpathy’s council idea. Backend: Groq + OpenRouter. Multi-model free-tier council with chairman synthesis.
 </footer>
 
 <script>
@@ -122,7 +136,20 @@ const finalDiv   = document.getElementById("final-answer");
 const rankingDiv = document.getElementById("ranking");
 const answersDiv = document.getElementById("answers");
 
-// Enter to send
+// Basic markdown renderer for bold/italic/code
+function renderMarkdown(text) {
+  if (!text) return "";
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`([^`]+)`/g, "<code style=\"background:#f4f4f4;padding:2px 4px;border-radius:4px;\">$1</code>")
+    .replace(/\n/g, "<br>");
+}
+
+// Enter-to-send support
 promptBox.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -138,7 +165,7 @@ askBtn.onclick = async () => {
   }
 
   askBtn.disabled = true;
-  statusDiv.textContent = "Thinking… council is deliberating (this may take 30–120 seconds).";
+  statusDiv.textContent = "Thinking… council is deliberating.";
   finalDiv.textContent = "Gathering council wisdom...";
   rankingDiv.style.display = "none";
   answersDiv.innerHTML = "";
@@ -150,14 +177,13 @@ askBtn.onclick = async () => {
   }, 1000);
 
   try {
-    const r = await fetch(BACKEND_URL, {
+    const resp = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: promptText })
     });
 
-    const data = await r.json();
-
+    const data = await resp.json();
     clearInterval(timer);
 
     if (data.error) {
@@ -167,14 +193,16 @@ askBtn.onclick = async () => {
       return;
     }
 
-    const usedCount = data.modelsUsed ? data.modelsUsed.length : 0;
+    const usedCount      = data.modelsUsed ? data.modelsUsed.length : 0;
+    const attemptedCount = data.modelsAttempted ? data.modelsAttempted.length : usedCount;
+
     statusDiv.textContent =
-      `Done. Used ${usedCount} models. Chairman: ${data.chairman || "Unknown"}.`;
+      `Done. Used ${usedCount}/${attemptedCount} models. Chairman: ${data.chairman || "Unknown"}.`;
 
-    // Final answer at top
-    finalDiv.textContent = data.final || "(No final answer returned.)";
+    // Final combined answer
+    finalDiv.innerHTML = renderMarkdown(data.final || "No final answer returned.");
 
-    // Ranking display
+    // Ranking view
     if (data.ranking && data.ranking.length && data.answers) {
       const rankLines = data.ranking
         .map((pos, idx) => {
@@ -193,7 +221,7 @@ askBtn.onclick = async () => {
       rankingDiv.style.display = "none";
     }
 
-    // Per-model answers
+    // Individual model answers
     answersDiv.innerHTML = "";
     if (data.answers && data.answers.length) {
       data.answers.forEach((ans, i) => {
@@ -201,7 +229,7 @@ askBtn.onclick = async () => {
         div.className = "model-answer";
         div.innerHTML =
           `<div class="model-title">Answer ${i + 1}: ${ans.label}</div>` +
-          `<div>${ans.text}</div>`;
+          `<div>${renderMarkdown(ans.text)}</div>`;
         answersDiv.appendChild(div);
       });
     }
