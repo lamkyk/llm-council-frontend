@@ -1,5 +1,22 @@
 Credit to https://x.com/karpathy/status/1992381094667411768
 
+This is **not** a lazy “drop-in an API key and call it a day” wrapper.
+
+What looks like a simple HTML page is the result of endless iteration, testing, and refinement:
+
+- pixel-perfect responsive layout that works flawlessly on mobile and desktop  
+- Enter vs Shift-Enter handling that behaves exactly as expected  
+- real-time status colors, graceful messages, and clear model-skipping feedback  
+- council ranks displayed with actual model names and color-coded placement  
+- seamless markdown + emoji rendering so responses never look broken  
+- aggressive throttling, exponential back-off, and batched reviews to stay safely under free-tier limits  
+- dozens of prompt revisions, hundreds of test runs, and constant back-and-forth tweaking until everything felt right  
+
+Every button press, every loading state, every line break was tested, re-tested, and polished.
+
+It’s one file. It just works.  
+And it only looks effortless because of a ridiculous amount of work to make it that way.
+
 # LLM Council (Secure Multi-Model Deliberation)
 
 LLM Council is a lightweight system for generating higher-quality answers by using multiple LLMs instead of depending on just one. A single prompt is sent to a group of diverse models, each produces its own response, they anonymously review and rank each other, and a designated “chairman” synthesizes everything into one final answer.
