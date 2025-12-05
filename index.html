@@ -230,6 +230,14 @@
     overflow-y: auto;
     z-index: 9999;
   }
+  /* Mobile fix: lower slide-out so Google Sites header doesn't cover the X */
+@media (max-width: 768px) {
+  #ranking-panel {
+    top: 70px !important;   /* Adjust this higher/lower until X is fully visible */
+    height: calc(100% - 70px) !important;
+  }
+}
+
 /* Mobile-safe slide-out offset */
 @media (max-width: 600px) {
   #ranking-panel {
