@@ -216,43 +216,38 @@
   }
 
   /* Ranking slide-out */
-  #ranking-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 320px;
-    height: 100%;
-    background: #f7f7f7;
-    border-left: 1px solid #ccc;
-    transform: translateX(100%);
-    transition: transform 0.25s ease;
-    padding: 16px;
-    overflow-y: auto;
-    z-index: 9999;
-  }
-  /* Mobile fix: lower slide-out so Google Sites header doesn't cover the X */
+#ranking-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: #f7f7f7;
+  border-left: 1px solid #ccc;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+/* Mobile fix: lower slide-out so Google Sites header doesn't cover the X */
 @media (max-width: 768px) {
   #ranking-panel {
-    top: 70px !important;   /* Adjust this higher/lower until X is fully visible */
-    height: calc(100% - 70px) !important;
+    top: 80px !important;
+    height: calc(100% - 80px) !important;
   }
 }
 
-/* Mobile-safe slide-out offset */
-@media (max-width: 600px) {
-  #ranking-panel {
-    top: 60px;   /* adjust 40–90 depending on Google Sites header */
-    height: calc(100% - 60px);
-  }
-} 
-  #ranking-panel.open {
-    transform: translateX(0);
-  }
-  #ranking-close {
-    text-align: end;
-    cursor: pointer;
-    margin-bottom: 40px;
-  }
+#ranking-panel.open {
+  transform: translateX(0);
+}
+
+#ranking-close {
+  text-align: end;
+  cursor: pointer;
+}
+
  /* Ranking panel text size patch */
 #ranking-body {
   font-size: 0.85em;
