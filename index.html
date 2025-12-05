@@ -39,13 +39,16 @@
 
   textarea {
     width: 100%;
-    height: 125px;
+    min-height: 60px;
+    max-height: 220px;
     padding: 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
     background: #ffffff;
     color: var(--text);
     font-size: 16px;
+    resize: none;
+    overflow-y: auto;
   }
   textarea.disabled {
     background: #e6e6e6;
@@ -83,6 +86,7 @@
   /* Status box */
   #status-box {
     margin-top: 16px;
+    margin-bottom: 12px;
     padding: 10px 14px;
     background: #ffffff;
     border: 1px solid var(--border);
@@ -101,87 +105,116 @@
     color: var(--placeholder);
   }
 
-  /* Inline ranks under status */
-  #inline-ranks {
+  /* Chat history container and bubbles */
+  #chat-container {
     margin-top: 10px;
-    font-size: 0.9em;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .chat-msg {
+    max-width: 90%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 0.96em;
+  }
+  .user-msg {
+    background: #e8e8e8;
+    margin-left: auto;
+  }
+  .bot-msg {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    margin-right: auto;
+  }
+
+  .bot-main {
+    margin-bottom: 8px;
+  }
+
+  .bot-council {
+    border-top: 1px solid #eee;
+    padding-top: 6px;
+    font-size: 0.88em;
     color: var(--subtle);
   }
 
-  /* Final answer card (hidden until response) */
-  #answer-card {
-    margin-top: 14px;
-    padding: 18px;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    line-height: 1.55;
-    display: none; /* key: hidden until we have an answer */
+  .bot-council-title {
+    font-weight: 600;
+    margin-bottom: 4px;
   }
 
-  #answer-content {
-    color: #000;
-    font-size: 1em;
-  }
-  #answer-content br + br { display: none; }
-  #answer-content strong { font-size: 1.05em; }
-  #answer-content ul,
-  #answer-content ol {
-    margin: 6px 0;
-    padding-left: 20px;
+  .bot-council-lines {
+    margin-bottom: 4px;
   }
 
-  /* Modern collapsible transcripts */
+  .bot-council-lines div {
+    margin: 1px 0;
+  }
+
+  .bot-council-actions {
+    margin-top: 4px;
+  }
+
+  .council-details-link,
+  .council-open-ranking {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .council-open-ranking {
+    margin-left: 8px;
+  }
+
+  .council-transcripts {
+    margin-top: 6px;
+    display: none;
+  }
+
+  /* Collapsible transcripts */
   .transcript-card {
-    margin-top: 10px;
+    margin-top: 6px;
     border-radius: 6px;
     border: 1px solid #e3e3e3;
     background: #fcfcfc;
     overflow: hidden;
   }
   .transcript-header {
-    padding: 8px 12px;
+    padding: 6px 10px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 0.9em;
+    font-size: 0.85em;
   }
-  .transcript-header span.model {
+  .transcript-header .model {
     font-weight: 600;
     flex: 1;
   }
-  .transcript-header span.meta {
-    font-size: 0.8em;
+  .transcript-header .meta {
+    font-size: 0.78em;
     color: var(--subtle);
     margin-right: 6px;
   }
-  .transcript-header span.chevron {
-    font-size: 0.8em;
+  .transcript-header .chevron {
+    font-size: 0.78em;
     transition: transform 0.15s ease;
   }
+  .transcript-card.open .chevron {
+    transform: rotate(90deg);
+  }
   .transcript-body {
-    padding: 10px 12px 12px;
+    padding: 8px 10px 10px;
     border-top: 1px solid #eee;
-    font-size: 0.9em;
+    font-size: 0.85em;
     display: none;
   }
   .transcript-card.open .transcript-body {
     display: block;
   }
-  .transcript-card.open .transcript-header .chevron {
-    transform: rotate(90deg);
-  }
 
-  /* Sliding ranking panel */
-  #ranking-toggle {
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: var(--subtle);
-    cursor: pointer;
-    text-decoration: underline;
-    display: none;
-  }
-
+  /* Ranking slide-out */
   #ranking-panel {
     position: fixed;
     top: 0;
@@ -190,40 +223,36 @@
     height: 100%;
     background: #f7f7f7;
     border-left: 1px solid #ccc;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.08);
     transform: translateX(100%);
     transition: transform 0.25s ease;
     padding: 16px;
     overflow-y: auto;
     z-index: 9999;
-    font-size: 0.9em;
   }
   #ranking-panel.open {
     transform: translateX(0);
   }
   #ranking-close {
-    text-align: right;
+    text-align: end;
     cursor: pointer;
     margin-bottom: 6px;
   }
-  #ranking-body h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
-  }
+ /* Ranking panel text size patch */
+#ranking-body {
+  font-size: 0.85em;
+}
+#ranking-body .ranking-row {
+  font-size: 0.85em;
+}
+#ranking-body strong {
+  font-size: 0.9em;
+}
   .ranking-row {
     border-radius: 6px;
     background: #ffffff;
     border: 1px solid #e2e2e2;
     padding: 8px 10px;
     margin-bottom: 6px;
-  }
-  .ranking-row strong {
-    display: block;
-    margin-bottom: 2px;
-  }
-  .ranking-row span.meta {
-    font-size: 0.8em;
-    color: var(--subtle);
   }
 
   /* Dots animation */
@@ -239,49 +268,106 @@
     100% { opacity: 0.2; }
   }
 
-.info-icon {
-  font-family: Lato, sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1.5px solid #666;
-  color: #666;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-  position: relative;
-}
+  .info-icon {
+    font-family: Lato, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid #666;
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    position: relative;
+  }
 
-.info-icon:hover {
-  background: #666;
-  color: white;
-}
+  .info-icon:hover {
+    background: #666;
+    color: white;
+  }
 
-.info-tooltip {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  top: 26px;
-  left: 0;
-  width: 260px;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  padding: 10px 12px;
-  font-size: 12px;
-  line-height: 1.45;
-  border-radius: 6px;
-  transition: opacity 0.25s ease;
-  z-index: 999;
-}
+  .info-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 26px;
+    left: 0;
+    width: 260px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    border-radius: 6px;
+    transition: opacity 0.25s ease;
+    z-index: 999;
+  }
 
-.info-icon:hover .info-tooltip {
-  visibility: visible;
-  opacity: 1;
-}
+  .info-icon:hover .info-tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
 
+  /* Dark mode toggle icon */
+  .theme-icon {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.7;
+  }
+  .theme-icon:hover {
+    opacity: 1;
+  }
+
+  /* Dark mode theme */
+  body.dark-mode {
+    background: #111 !important;
+    color: #eee;
+  }
+  body.dark-mode textarea {
+    background: #1d1d1d;
+    color: #eee;
+    border-color: #444;
+  }
+  body.dark-mode #status-box {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+  body.dark-mode .ranking-row {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+  body.dark-mode .transcript-card {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+  body.dark-mode .transcript-body {
+    background: #1a1a1a;
+  }
+  body.dark-mode .user-msg {
+    background: #333;
+    color: #eee;
+  }
+  body.dark-mode .bot-msg {
+    background: #222;
+    color: #eee;
+    border-color: #444;
+  }
+  body.dark-mode #ranking-panel {
+    background: #161616;
+    border-color: #444;
+  }
+
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: #777;
+    font-family: Lato, sans-serif;
+  }
 </style>
 </head>
 <body>
@@ -298,13 +384,24 @@
       model alone.
     </span>
   </span>
+  <span id="theme-toggle" class="theme-icon">☾</span>
 </h1>
+
 <br>
 
 <div class="subtitle">
   Council stack: Groq Llama-3.1 8B, Groq Llama-3.3 70B, GPT-OSS-20B,
   LLaMA-3.1 8B Instruct, Kimi-K2, DeepSeek V3, DeepSeek Chat,
   DeepSeek Reasoner, Gemini Flash 2.0.
+</div>
+
+<!-- Chat history -->
+<div id="chat-container"></div>
+
+<!-- Status box moved here, above prompt -->
+<div id="status-box">
+  <div id="status-line" class="placeholder-style">Status: Ready</div>
+  <div id="status-subline" class="placeholder-style">Waiting for your question…</div>
 </div>
 
 <div class="prompt-wrap">
@@ -314,19 +411,7 @@
 
 <button id="ask">Ask the Council</button>
 
-<div id="status-box">
-  <div id="status-line" class="placeholder-style">Status: Ready</div>
-  <div id="status-subline" class="placeholder-style">Waiting for your question…</div>
-</div>
-
-<div id="inline-ranks"></div>
-
-<div id="answer-card">
-  <div id="answer-content"></div>
-  <div id="ranking-toggle">View council details ▸</div>
-  <div id="transcripts"></div>
-</div>
-
+<!-- Ranking slide-out -->
 <div id="ranking-panel">
   <div id="ranking-close">✕</div>
   <div id="ranking-body"></div>
@@ -346,22 +431,47 @@ function md(text) {
     .replace(/\n/g, "<br>");
 }
 
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 const askBtn        = document.getElementById("ask");
 const promptBox     = document.getElementById("prompt");
 const stopIcon      = document.getElementById("stop-icon");
 const statusLine    = document.getElementById("status-line");
 const statusSubline = document.getElementById("status-subline");
-const inlineRanks   = document.getElementById("inline-ranks");
-const answerCard    = document.getElementById("answer-card");
-const answerContent = document.getElementById("answer-content");
-const transcriptsDiv= document.getElementById("transcripts");
-const rankingToggle = document.getElementById("ranking-toggle");
+const chatContainer = document.getElementById("chat-container");
 const rankingPanel  = document.getElementById("ranking-panel");
 const rankingClose  = document.getElementById("ranking-close");
 const rankingBody   = document.getElementById("ranking-body");
+const themeToggle   = document.getElementById("theme-toggle");
 
 let controller = null;
 let timerId    = null;
+
+/* Dark mode load */
+(function applyThemeFromStorage() {
+  const t = localStorage.getItem("llm_theme");
+  if (t === "dark") {
+    document.body.classList.add("dark-mode");
+    if (themeToggle) themeToggle.textContent = "☀";
+  }
+})();
+
+if (themeToggle) {
+  themeToggle.onclick = () => {
+    const dark = document.body.classList.toggle("dark-mode");
+    themeToggle.textContent = dark ? "☀" : "☾";
+    localStorage.setItem("llm_theme", dark ? "dark" : "light");
+  };
+}
 
 function lockPrompt() {
   promptBox.classList.add("disabled");
@@ -372,10 +482,23 @@ function unlockPrompt() {
   promptBox.disabled = false;
 }
 
+function autoResize() {
+  promptBox.style.height = "auto";
+  const maxHeight = 220;
+  const newHeight = Math.min(maxHeight, promptBox.scrollHeight);
+  promptBox.style.height = newHeight + "px";
+}
+
+promptBox.addEventListener("input", autoResize);
+autoResize();
+
+/* Desktop: Enter sends. Mobile: Enter = newline only */
 promptBox.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    askBtn.click();
+  if (!isMobile()) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      askBtn.click();
+    }
   }
 });
 
@@ -389,29 +512,30 @@ stopIcon.onclick = () => {
   statusSubline.textContent = "";
 };
 
-rankingToggle.onclick = () => rankingPanel.classList.add("open");
 rankingClose.onclick  = () => rankingPanel.classList.remove("open");
 
 askBtn.onclick = async () => {
-  const prompt = promptBox.value.trim();
+  const promptText = promptBox.value;
+  const prompt = promptText.trim();
   if (!prompt) {
     alert("Type a question first.");
     return;
   }
 
+  // Append user message bubble
+  const userDiv = document.createElement("div");
+  userDiv.className = "chat-msg user-msg";
+  userDiv.innerHTML = escapeHtml(promptText);
+  chatContainer.appendChild(userDiv);
+
+  // Clear prompt for next message & resize
+  promptBox.value = "";
+  autoResize();
+
   controller = new AbortController();
   askBtn.disabled = true;
   lockPrompt();
   stopIcon.style.display = "block";
-
-  // reset UI
-  rankingToggle.style.display = "none";
-  rankingPanel.classList.remove("open");
-  rankingBody.innerHTML = "";
-  transcriptsDiv.innerHTML = "";
-  inlineRanks.textContent = "";
-  answerCard.style.display = "none";
-  answerContent.innerHTML = "";
 
   statusLine.textContent = "Thinking… 0s (council may take 20–60s)";
   statusLine.classList.remove("placeholder-style");
@@ -450,43 +574,59 @@ askBtn.onclick = async () => {
     statusLine.textContent = `Done. Used ${used}/${total}. Chairman: ${data.chairman}`;
     statusSubline.textContent = "";
 
-    // show answer card
-    answerCard.style.display = "block";
-    answerContent.innerHTML = md(data.final || "No final answer.");
+    // Build assistant bubble
+    const botDiv = document.createElement("div");
+    botDiv.className = "chat-msg bot-msg";
 
-    // inline ranks (top 3)
+    const mainDiv = document.createElement("div");
+    mainDiv.className = "bot-main";
+    mainDiv.innerHTML = md(data.final || "No final answer.");
+
+    const councilDiv = document.createElement("div");
+    councilDiv.className = "bot-council";
+
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "bot-council-title";
+    titleDiv.textContent = "Council Top Picks:";
+
+    const linesDiv = document.createElement("div");
+    linesDiv.className = "bot-council-lines";
+
     if (data.ranking && data.ranking.length) {
-      const lines = data.ranking.slice(0, 3).map((pos, i) => {
+      const top = data.ranking.slice(0, 3);
+      top.forEach((pos, i) => {
         const idx   = pos - 1;
         const model = data.modelsUsed[idx];
         const pct   = data.percentages[idx];
         const conf  = data.avgConfidences[idx]?.toFixed(2);
-        return `#${i + 1}: ${model} — ${pct}% (avg conf ${conf})`;
+        const line  = document.createElement("div");
+        line.textContent = `#${i + 1} ${model} — ${pct}% (avg conf ${conf})`;
+        linesDiv.appendChild(line);
       });
-      inlineRanks.innerHTML = lines.join("<br>");
+    } else {
+      const line = document.createElement("div");
+      line.textContent = "No ranking available.";
+      linesDiv.appendChild(line);
     }
 
-    // ranking panel content
-    if (data.ranking && data.ranking.length) {
-      let html = `<h3>Council ranking</h3>`;
-      data.ranking.forEach((pos, i) => {
-        const idx   = pos - 1;
-        const model = data.modelsUsed[idx];
-        const pct   = data.percentages[idx];
-        const conf  = data.avgConfidences[idx]?.toFixed(2);
-        html += `
-          <div class="ranking-row">
-            <strong>#${i + 1} — ${model}</strong>
-            <span class="meta">Weighted: ${pct}% · Avg conf: ${conf}</span>
-          </div>
-        `;
-      });
-      html += `<p><strong>Reason:</strong> ${data.rankingReason || "N/A"}</p>`;
-      rankingBody.innerHTML = html;
-      rankingToggle.style.display = "inline-block";
-    }
+    const actionsDiv = document.createElement("div");
+    actionsDiv.className = "bot-council-actions";
 
-    // transcripts as collapsible cards
+    const detailsLink = document.createElement("span");
+    detailsLink.className = "council-details-link";
+    detailsLink.textContent = "View council details ▸";
+
+    const openRankingLink = document.createElement("span");
+    openRankingLink.className = "council-open-ranking";
+    openRankingLink.textContent = "Open ranking panel";
+
+    actionsDiv.appendChild(detailsLink);
+    actionsDiv.appendChild(openRankingLink);
+
+    const transcriptsWrap = document.createElement("div");
+    transcriptsWrap.className = "council-transcripts";
+
+    // transcripts as collapsible cards (inside this bubble)
     if (Array.isArray(data.transcripts)) {
       data.transcripts.forEach((t) => {
         const card = document.createElement("div");
@@ -524,9 +664,54 @@ askBtn.onclick = async () => {
 
         card.appendChild(header);
         card.appendChild(body);
-        transcriptsDiv.appendChild(card);
+        transcriptsWrap.appendChild(card);
       });
     }
+
+    // toggle transcripts section
+    let transcriptsVisible = false;
+    detailsLink.onclick = () => {
+      transcriptsVisible = !transcriptsVisible;
+      transcriptsWrap.style.display = transcriptsVisible ? "block" : "none";
+    };
+
+    // open ranking slide-out panel
+    openRankingLink.onclick = () => {
+      rankingPanel.classList.add("open");
+    };
+
+    councilDiv.appendChild(titleDiv);
+    councilDiv.appendChild(linesDiv);
+    councilDiv.appendChild(actionsDiv);
+    councilDiv.appendChild(transcriptsWrap);
+
+    botDiv.appendChild(mainDiv);
+    botDiv.appendChild(councilDiv);
+    chatContainer.appendChild(botDiv);
+
+    // build ranking slide-out content for this turn
+    if (data.ranking && data.ranking.length) {
+      let html = `<h3>Council ranking</h3>`;
+      data.ranking.forEach((pos, i) => {
+        const idx   = pos - 1;
+        const model = data.modelsUsed[idx];
+        const pct   = data.percentages[idx];
+        const conf  = data.avgConfidences[idx]?.toFixed(2);
+        html += `
+          <div class="ranking-row">
+            <strong>#${i + 1} — ${model}</strong>
+            <span class="meta">Weighted: ${pct}% · Avg conf: ${conf}</span>
+          </div>
+        `;
+      });
+      html += `<p><strong>Reason:</strong> ${data.rankingReason || "N/A"}</p>`;
+      rankingBody.innerHTML = html;
+    } else {
+      rankingBody.innerHTML = "<p>No ranking data for this turn.</p>";
+    }
+
+    // Scroll to bottom to show latest messages
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 
   } catch (err) {
     if (timerId) clearInterval(timerId);
@@ -538,9 +723,10 @@ askBtn.onclick = async () => {
   }
 };
 </script>
-<footer style="margin-top:32px;text-align:center;font-size:11px;color:#777;font-family:Lato, sans-serif;">
-  Inspired by @karpathy’s original Council. Adapted and designed by Kyle.<br> <br>
-<small>⚙️ 2025-2026</small>
+
+<footer>
+  Inspired by @karpathy’s original Council. Adapted and designed by Kyle.<br><br>
+  <small>⚙️ 2025-2026</small>
 </footer>
 
 </body>
